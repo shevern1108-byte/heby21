@@ -12,7 +12,7 @@ python -m http.server 8000
 
 Then open `http://localhost:8000`.
 
-The birthday update appears once per UTC+8 calendar day and retriggers when the date changes at midnight. To force a preview, double-click `birthday-preview.html` or visit `http://localhost:8000/?birthday=1`.
+The birthday update triggers when an open page crosses midnight in UTC+8. It does not appear early when the normal page is opened. To force a preview, double-click `birthday-preview.html` or visit `http://localhost:8000/?birthday=1`.
 
 ## Content
 

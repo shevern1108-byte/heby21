@@ -24,9 +24,10 @@ let z = 10;
 let soundsOn = true;
 let recycleIntroSeen = false;
 let recycleWarningStep = 0;
-const BIRTHDAY_STORAGE_KEY = "heby21-last-midnight-update";
+const BIRTHDAY_STORAGE_KEY = "heby21-midnight-update-v2";
 const forceBirthdayPreview = new URLSearchParams(window.location.search).get("birthday") === "1" || window.location.hash === "#birthday";
 let birthdayPromptDate = "";
+let observedDate = "";
 let audioContext;
 let friendsHintShown = false;
 
@@ -81,6 +82,7 @@ function showDesktop() {
   updateClock();
   setInterval(updateClock, 30000);
   restoreBirthdayWallpaper();
+  observedDate = shanghaiDateKey();
   checkBirthdayMoment();
 }
 
@@ -115,10 +117,12 @@ function showBirthdayPrompt(dateKey = shanghaiDateKey()) {
 
 function checkBirthdayMoment() {
   const today = shanghaiDateKey();
-  if (forceBirthdayPreview || storageGet(BIRTHDAY_STORAGE_KEY) !== today) {
-    if (!forceBirthdayPreview) $("#desktop").classList.remove("birthday-mode");
-    showBirthdayPrompt(forceBirthdayPreview ? "preview" : today);
-  }
+  if (forceBirthdayPreview) return showBirthdayPrompt("preview");
+  if (!observedDate) return void (observedDate = today);
+  if (today === observedDate) return;
+  observedDate = today;
+  $("#desktop").classList.remove("birthday-mode");
+  showBirthdayPrompt(today);
 }
 
 function applyBirthdayUpdate() {
