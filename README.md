@@ -1,5 +1,7 @@
 # heby's21.exe
 
+Birthday: 30 September (0930)
+
 A static, single-page birthday website. No backend or build step is required.
 
 ## Preview
