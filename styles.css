@@ -157,15 +157,13 @@ button { font: inherit; color: inherit; }
 .toast.show { opacity:1; transform:translate(-50%,0); }
 
 .letter-screen { z-index:110; overflow:auto; padding:60px 20px; background:linear-gradient(160deg,#d9d3fa,#f8f4ff 44%,#fffdf8); }
-.letter-paper { width:min(720px,100%); min-height:calc(100vh - 120px); margin:auto; padding:60px clamp(28px,7vw,82px); background:var(--paper); border:1px solid #aaa4db; box-shadow:12px 15px 0 rgba(118,102,201,.16); }
+.letter-paper { width:min(1040px,100%); min-height:calc(100vh - 120px); margin:auto; padding:46px clamp(18px,4vw,54px); background:var(--paper); border:1px solid #aaa4db; box-shadow:12px 15px 0 rgba(118,102,201,.16); }
 .letter-paper h2 { margin:10px 0 5px; font:600 clamp(2rem,6vw,3.4rem) "Arial Rounded MT Bold","Segoe UI",sans-serif; letter-spacing:-.055em; }
 .letter-date { color:var(--violet); font-size:.72rem; }
-.letter-body { margin:42px 0; font-family:"ArkPixel","Microsoft YaHei UI",sans-serif; font-size:1.05rem; line-height:2; }
-.signature { font:1.7rem "Comic Sans MS",cursive; color:var(--violet); }
-.letter-attachment { padding:10px 12px; color:var(--violet-dark); background:var(--ice); border:1px dashed var(--violet); cursor:pointer; }
-.attachment-preview { margin:18px 0; padding:12px; background:white; border:1px solid #aaa4db; }
-.attachment-placeholder { height:260px; display:grid; place-items:center; background:var(--lavender); color:var(--violet-dark); }
-.attachment-preview figcaption { margin-top:8px; font:1rem "ArkPixel","Microsoft YaHei UI",sans-serif; }
+.letter-pages { display:grid; gap:28px; margin:36px 0 38px; }
+.letter-page { position:relative; margin:0; padding:10px 10px 30px; background:#fff; border:1px solid #c9c5df; box-shadow:5px 6px 0 rgba(91,82,171,.13); }
+.letter-page img { display:block; width:100%; height:auto; background:#fff; }
+.letter-page figcaption { position:absolute; right:14px; bottom:8px; color:#7168b6; font-size:.62rem; letter-spacing:.12em; }
 .primary-button { min-width:160px; padding:13px 20px; color:white; background:var(--violet); border:2px solid var(--violet-dark); box-shadow:4px 4px 0 var(--pink); cursor:pointer; }
 .primary-button:hover { transform:translate(1px,1px); box-shadow:3px 3px 0 var(--pink); }
 
@@ -401,6 +399,10 @@ button { font: inherit; color: inherit; }
   .app-window,.archive-window,.list-window,.message-window,.viewer-window,.recycle-window { outline-offset:-4px; }
   .gallery-grid { gap:22px 12px; }
   .polaroid { padding:7px 7px 27px; }
+  .letter-screen { padding:24px 10px; }
+  .letter-paper { padding:30px 10px 24px; }
+  .letter-paper > .eyebrow,.letter-paper > h2,.letter-date { margin-left:8px; margin-right:8px; }
+  .letter-page { padding:5px 5px 25px; }
 }
 
 /* Supplied pixel icons */

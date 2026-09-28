@@ -342,7 +342,6 @@ $("#friends-toggle").addEventListener("click", (event) => {
 });
 $("#start-button").addEventListener("click", () => { playSound("click"); showToast("Welcome to Heby's memory system ♡"); });
 $("#sound-toggle").addEventListener("click", (event) => { soundsOn = !soundsOn; event.currentTarget.textContent = soundsOn ? "♬" : "♩̸"; if (soundsOn) playSound("click"); showToast(soundsOn ? "Sound on" : "Sound muted"); });
-$(".letter-attachment").addEventListener("click", () => { playSound("click"); $(".attachment-preview").classList.toggle("hidden"); });
 $("#close-letter").addEventListener("click", () => { playSound("unlock"); $("#letter").classList.add("hidden"); $("#complete").classList.remove("hidden"); });
 $("#shutdown").addEventListener("click", () => { playSound("shutdown"); $("#complete").classList.add("hidden"); $("#shutdown-screen").classList.remove("hidden"); });
 $("#apply-birthday-update").addEventListener("click", applyBirthdayUpdate);
