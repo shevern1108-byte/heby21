@@ -29,15 +29,52 @@ const forceBirthdayPreview = new URLSearchParams(window.location.search).get("bi
 let birthdayPromptDate = "";
 let observedDate = "";
 let audioContext;
+let audioUnlockPromise;
 let friendsHintShown = false;
 
 const $ = (selector) => document.querySelector(selector);
 const asset = (folder, name) => `assets/${folder}/${name}`;
 
+function primeAudioContext(ctx) {
+  try {
+    const buffer = ctx.createBuffer(1, 1, 22050);
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(ctx.destination);
+    source.start(0);
+  } catch (_) { /* Older WebKit may reject priming until resume finishes. */ }
+}
+
 function ensureAudio() {
-  if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioContext.state === "suspended") audioContext.resume();
-  return audioContext;
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return Promise.resolve(null);
+  if (!audioContext || audioContext.state === "closed") {
+    try { audioContext = new AudioContextClass({ latencyHint:"interactive" }); }
+    catch (_) { audioContext = new AudioContextClass(); }
+    audioUnlockPromise = null;
+  }
+  primeAudioContext(audioContext);
+  if (audioContext.state === "running") return Promise.resolve(audioContext);
+  if (!audioUnlockPromise) {
+    audioUnlockPromise = Promise.resolve(audioContext.resume())
+      .catch(() => null)
+      .then(() => {
+        primeAudioContext(audioContext);
+        return audioContext;
+      })
+      .finally(() => { audioUnlockPromise = null; });
+  }
+  return audioUnlockPromise;
+}
+
+function scheduleSound(ctx, pattern) {
+  if (!ctx || ctx.state !== "running") return;
+  pattern.forEach(([frequency,duration,delay]) => {
+    const oscillator=ctx.createOscillator(), gain=ctx.createGain(), start=ctx.currentTime+delay+.006;
+    oscillator.type="square"; oscillator.frequency.setValueAtTime(frequency,start);
+    gain.gain.setValueAtTime(.0001,start); gain.gain.exponentialRampToValueAtTime(.035,start+.008); gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
+    oscillator.connect(gain).connect(ctx.destination); oscillator.start(start); oscillator.stop(start+duration+.025);
+  });
 }
 
 function playSound(name) {
@@ -47,14 +84,22 @@ function playSound(name) {
     warning:[[250,.1,0],[190,.13,.1]], nope:[[180,.06,0],[120,.08,.07]], unlock:[[523,.08,0],[659,.08,.09],[784,.16,.18]],
     birthday:[[523,.1,0],[659,.1,.11],[784,.1,.22],[1047,.28,.33]], shutdown:[[420,.12,0],[315,.15,.13],[210,.28,.29]]
   };
-  const ctx = ensureAudio();
-  (patterns[name] || patterns.click).forEach(([frequency,duration,delay]) => {
-    const oscillator=ctx.createOscillator(), gain=ctx.createGain(), start=ctx.currentTime+delay;
-    oscillator.type="square"; oscillator.frequency.setValueAtTime(frequency,start);
-    gain.gain.setValueAtTime(.0001,start); gain.gain.exponentialRampToValueAtTime(.035,start+.008); gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
-    oscillator.connect(gain).connect(ctx.destination); oscillator.start(start); oscillator.stop(start+duration+.02);
+  ensureAudio().then((ctx) => scheduleSound(ctx, patterns[name] || patterns.click));
+}
+
+function unlockAudioFromGesture() {
+  ensureAudio().then((ctx) => {
+    if (!ctx || ctx.state !== "running") return;
+    document.documentElement.classList.add("audio-ready");
   });
 }
+
+document.addEventListener("pointerdown", unlockAudioFromGesture, { capture:true, passive:true });
+document.addEventListener("touchend", unlockAudioFromGesture, { capture:true, passive:true });
+document.addEventListener("keydown", unlockAudioFromGesture, { capture:true });
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && audioContext) ensureAudio();
+});
 
 function showFriendsHintOnce() {
   if (friendsHintShown) return;
@@ -335,7 +380,6 @@ function showToast(message) {
 
 document.querySelectorAll("[data-open]").forEach((button) => button.addEventListener("click", () => openWindow(button.dataset.open)));
 $("#friends-toggle").addEventListener("click", (event) => {
-  ensureAudio();
   playSound("click");
   $("#friends-hint").classList.add("hidden");
   event.currentTarget.classList.toggle("is-smiling");
